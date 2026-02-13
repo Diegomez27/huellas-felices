@@ -1,3 +1,20 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import "tailwindcss";
+
+@theme {
+  --color-primary: #F59E0B;
+  --color-primary-light: #FCD34D;
+  --color-primary-dark: #B45309;
+
+  --color-secondary: #14B8A6;
+  --color-secondary-light: #5EEAD4;
+  --color-secondary-dark: #0F766E;
+
+  --color-accent: #EF4444; 
+  --color-surface: #FFFBEB;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background-color: var(--color-surface);
+  color: #1f2937; /* gray-900 */
+}
