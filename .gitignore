@@ -44,3 +44,9 @@ __screenshots__/
 .DS_Store
 Thumbs.db
 /.gemini
+
+
+frontend_implementation.md
+
+/src/environments/environment.ts
+/src/environments/environment.development.ts
