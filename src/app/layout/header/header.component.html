@@ -5,8 +5,10 @@
       <span class="text-xl font-bold tracking-tight">Huellas Felices</span>
     </a>
 
-    <!-- User Actions (Placeholder) -->
-    <button class="p-2 rounded-full hover:bg-primary-dark transition-colors" aria-label="User Profile">
+    <!-- User Actions -->
+    <button (click)="logout()" class="p-2 rounded-full hover:bg-primary-dark transition-colors flex items-center gap-2"
+      aria-label="Logout">
+      <span class="text-sm font-medium hidden md:block">Salir</span>
       <div class="w-8 h-8 rounded-full bg-surface/20 flex items-center justify-center">
         <span class="text-sm font-medium">U</span>
       </div>

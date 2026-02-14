@@ -1,59 +1,99 @@
-# HuellasFelices
+# Huellas Felices 🐾
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.2.
+**Huellas Felices** is a smart pet management platform designed to give pet owners peace of mind. It integrates with a smart collar to monitor real-time location, health, and activity, accessible via a mobile-first web application.
 
-## Development server
+## 🚀 Tech Stack
 
-To start a local development server, run:
+- **Frontend**: Angular 19+ (Standalone Components, Signals, Zoning).
+- **Styling**: Tailwind CSS v4 (Custom Theme).
+- **Backend**: NestJS (Planned).
+- **State Management**: Angular Signals.
 
-```bash
-ng serve
+## 🛠️ Prerequisites
+
+- **Node.js**: v18 or higher.
+- **npm**: v10 or higher.
+- **Angular CLI**: v19+.
+
+## 📦 Installation & Setup
+
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/your-username/huellas-felices.git
+    cd huellas-felices
+    ```
+
+2.  **Install dependencies**:
+    ```bash
+    npm install
+    ```
+
+3.  **Start the development server**:
+    ```bash
+    npm start
+    # or
+    ng serve
+    ```
+
+4.  **Open the app**:
+    Navigate to `http://localhost:4200`.
+
+## 🏗️ Project Architecture
+
+The project follows a **Feature-Based Architecture** with a strict separation of concerns.
+
+```text
+src/app/
+├── core/           # Singleton services, models, guards, interceptors (e.g., AuthService, PetService).
+├── shared/         # Reusable "dumb" components, pipes, directives (e.g., CardComponent, ButtonComponent).
+├── layout/         # Structural components (Header, BottomNav, MainLayout).
+├── features/       # Feature modules containing "smart" components (pages).
+│   ├── dashboard/  # Home view with summary stats.
+│   ├── pets/       # Pet management (list, details).
+│   ├── map/        # Real-time location view.
+│   └── profile/    # User settings.
+└── app.routes.ts   # Lazy-loaded route definitions.
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## ✨ Best Practices & Guidelines
 
-## Code scaffolding
+This project strictly adheres to the following guidelines defined in `.gemini/GEMINI.md`.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### TypeScript
+- **Strict Typing**: No `any`. Use `unknown` if necessary.
+- **Type Inference**: Let TS infer types when obvious.
 
-```bash
-ng generate component component-name
-```
+### Angular
+- **Standalone Components**: No `NgModules`.
+- **Signals**: Use `signal()`, `computed()`, and `effect()` for all local state.
+- **OnPush Change Detection**: All components must use `changeDetection: ChangeDetectionStrategy.OnPush`.
+- **Control Flow**: Use new syntax `@if`, `@for`, `@switch`.
+- **Lazy Loading**: All feature routes are lazy-loaded.
+- **Image Optimization**: Use `NgOptimizedImage` (`ngSrc`) for all static assets.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### Accessibility (a11y)
+- **Semantic HTML**: Use correct elements (`<button>`, `<nav>`, `<header>`).
+- **ARIA**: Use `aria-label` where visual context is missing.
+- **Focus Management**: Ensure interactive elements are reachable via keyboard.
 
-```bash
-ng generate --help
-```
+### CSS / Styling
+- **Tailwind CSS**: Use utility classes.
+- **No `ngStyle`/`ngClass`**: Use `[style.prop]` or `[class.name]`.
+- **Theme**: Defined in `src/styles.css` using CSS variables mapped to Tailwind theme.
 
-## Building
+## 📱 Mobile-First Design
 
-To build the project run:
+- **Bottom Navigation**: Primary navigation is located at the bottom for mobile users.
+- **Touch Targets**: Buttons and interactive elements are sized for touch (min 44x44px where possible).
+- **Responsive**: Layout adapts to desktop by switching to a sidebar/header model (implementation in progress).
 
-```bash
-ng build
-```
+## 🧪 Development Commands
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+- `ng serve`: Run dev server.
+- `ng build`: Build for production.
+- `ng test`: Run unit tests.
+- `ng lint`: Run linter (if configured).
 
-## Running unit tests
+---
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
 
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

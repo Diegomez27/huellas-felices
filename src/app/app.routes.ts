@@ -1,13 +1,20 @@
 import { Routes } from '@angular/router';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
     {
+        path: 'login',
+        loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent),
+        title: 'Huellas Felices - Login'
+    },
+    {
         path: '',
         component: MainLayoutComponent,
+        canActivate: [authGuard],
         children: [
             {
-                path: '',
+                path: '', // Dashboard is default for authenticated users
                 loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
                 title: 'Huellas Felices - Dashboard'
             },
