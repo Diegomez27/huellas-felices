@@ -9,6 +9,11 @@ export const routes: Routes = [
         title: 'Huellas Felices - Login'
     },
     {
+        path: 'register',
+        loadComponent: () => import('./features/auth/register/register.component').then(m => m.RegisterComponent),
+        title: 'Huellas Felices - Registro'
+    },
+    {
         path: '',
         component: MainLayoutComponent,
         canActivate: [authGuard],
@@ -22,6 +27,16 @@ export const routes: Routes = [
                 path: 'pets',
                 loadComponent: () => import('./features/pets/pet-list/pet-list.component').then(m => m.PetListComponent),
                 title: 'Huellas Felices - My Pets'
+            },
+            {
+                path: 'pets/new',
+                loadComponent: () => import('./features/pets/pet-form/pet-form.component').then(m => m.PetFormComponent),
+                title: 'Huellas Felices - Nueva Mascota'
+            },
+            {
+                path: 'pets/:id/edit', // Order matters, specific matching first if overlapping, but :id is broad. 'new' must be before :id.
+                loadComponent: () => import('./features/pets/pet-form/pet-form.component').then(m => m.PetFormComponent),
+                title: 'Huellas Felices - Editar Mascota'
             },
             {
                 path: 'pets/:id',

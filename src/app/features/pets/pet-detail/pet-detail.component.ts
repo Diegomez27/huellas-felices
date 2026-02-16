@@ -1,42 +1,99 @@
-import { Component, ChangeDetectionStrategy, inject, signal, effect, input, computed } from '@angular/core';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Component, ChangeDetectionStrategy, inject, signal, Input, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule, NgOptimizedImage, DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { PetService } from '../../../core/services/pet.service';
+import { ActivityService, Activity } from '../../../core/services/activity.service';
+import { WebsocketService } from '../../../core/services/websocket.service';
 import { Pet } from '../../../core/models/pet.model';
+import Swal from 'sweetalert2';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-pet-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, NgOptimizedImage],
+  imports: [CommonModule, RouterLink, NgOptimizedImage, DatePipe, FormsModule],
   templateUrl: './pet-detail.component.html',
   styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PetDetailComponent {
-  private route = inject(ActivatedRoute);
+export class PetDetailComponent implements OnInit, OnDestroy {
   private petService = inject(PetService);
+  private activityService = inject(ActivityService);
+  private wsService = inject(WebsocketService);
 
-  // Derive pet from route param
-  pet = checkPet(this.route, this.petService);
-}
+  @Input() id?: string; // Component Input Binding matches route param :id
 
-// Helper to handle signal/observable mix nicely if needed, or just use effect
-function checkPet(route: ActivatedRoute, petService: PetService) {
-  const pets = petService.pets;
-  // We need to capture the ID. 
-  // Route params are observables. 
-  // For simplicity in this mock, we'll assume we can get it or just map it.
-  // But we need a Signal for the ID to make it reactive with signals.
-  // Angular Router v19+ supports binding inputs to params naturally! 
-  // Let's use `withComponentInputBinding` in app config (checked default, might not be on)
-  // If not, we use basic route subscription or toSignal.
-  // For now, let's just use a simple computed if we had the ID as signal.
-  // Assuming Router Input Binding is NOT enabled by default in my quick check of app.config (I didn't see it).
-  // I'll stick to a simple signal update via constructor for now or just standard RxJS -> Signal.
+  pet = signal<Pet | undefined>(undefined);
+  activities = signal<Activity[]>([]);
+  currentLocation = signal<{ lat: number, lng: number } | null>(null);
 
-  // Actually, standard practice for now:
-  const id = signal<string | null>(null);
-  route.paramMap.subscribe(params => id.set(params.get('id')));
+  private locationSub?: Subscription;
 
-  return computed(() => pets().find(p => p.id === id()));
+  // Form State
+  isAddingActivity = signal(false);
+  isLoadingActivity = signal(false);
+  newActivityType = signal<'walk' | 'play' | 'rest'>('walk');
+  newActivityDuration = signal(30);
+
+  async ngOnInit() {
+    if (this.id) {
+      await this.loadData();
+
+      // Real-time setup
+      this.wsService.joinPetRoom(this.id);
+      this.locationSub = this.wsService.getLocationUpdates().subscribe(data => {
+        if (data.petId === this.id) {
+          this.currentLocation.set({ lat: data.lat, lng: data.lng });
+          // Optionally update map marker or toast
+          console.log('New location:', data);
+        }
+      });
+    }
+  }
+
+  ngOnDestroy() {
+    this.locationSub?.unsubscribe();
+    this.wsService.disconnect();
+  }
+
+  async loadData() {
+    if (!this.id) return;
+    const pet = await this.petService.getPet(this.id);
+    this.pet.set(pet);
+
+    if (pet) {
+      const acts = await this.activityService.getPetActivities(this.id);
+      this.activities.set(acts);
+    }
+  }
+
+  async saveActivity() {
+    if (!this.id) return;
+
+    this.isLoadingActivity.set(true);
+    const activity: Activity = {
+      petId: this.id,
+      type: this.newActivityType(),
+      duration: this.newActivityDuration(),
+      timestamp: new Date()
+    };
+
+    const success = await this.activityService.logActivity(activity);
+    if (success) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Actividad registrada',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000
+      });
+      this.isAddingActivity.set(false);
+      await this.loadData(); // Reload to show new activity
+    } else {
+      Swal.fire('Error', 'No se pudo registrar la actividad', 'error');
+    }
+    this.isLoadingActivity.set(false);
+  }
 }

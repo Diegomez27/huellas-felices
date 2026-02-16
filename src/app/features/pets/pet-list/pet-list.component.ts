@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PetService } from '../../../core/services/pet.service';
@@ -12,6 +12,10 @@ import { PetCardComponent } from '../components/pet-card/pet-card.component';
   styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PetListComponent {
+export class PetListComponent implements OnInit {
   petService = inject(PetService);
+
+  ngOnInit(): void {
+    this.petService.loadPets();
+  }
 }

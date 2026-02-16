@@ -1,0 +1,124 @@
+<div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="flex justify-center">
+            <div
+                class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center text-white shadow-lg -rotate-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                </svg>
+            </div>
+        </div>
+        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Crear una cuenta
+        </h2>
+        <p class="mt-2 text-center text-sm text-gray-600">
+            Únete a Huellas Felices
+        </p>
+    </div>
+
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-gray-100">
+            <form class="space-y-6" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+                <!-- Name -->
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700">Nombre completo</label>
+                    <div class="mt-1">
+                        <input id="name" type="text" formControlName="name"
+                            class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                    </div>
+                    @if (f['name'].touched && f['name'].errors?.['required']) {
+                    <p class="mt-1 text-xs text-red-600">El nombre es requerido</p>
+                    }
+                    @if (f['name'].touched && f['name'].errors?.['minlength']) {
+                    <p class="mt-1 text-xs text-red-600">El nombre debe tener al menos 3 caracteres</p>
+                    }
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <div class="mt-1">
+                        <input id="email" type="email" formControlName="email"
+                            class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                    </div>
+                    @if (f['email'].touched && f['email'].errors?.['required']) {
+                    <p class="mt-1 text-xs text-red-600">El email es requerido</p>
+                    }
+                    @if (f['email'].touched && f['email'].errors?.['email']) {
+                    <p class="mt-1 text-xs text-red-600">Ingresa un email válido</p>
+                    }
+                </div>
+
+                <!-- Phone -->
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-700">Teléfono (Opcional)</label>
+                    <div class="mt-1">
+                        <input id="phone" type="tel" formControlName="phone"
+                            class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                    </div>
+                    @if (f['phone'].touched && f['phone'].errors?.['pattern']) {
+                    <p class="mt-1 text-xs text-red-600">Solo se permiten números</p>
+                    }
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
+                    <div class="mt-1">
+                        <input id="password" type="password" formControlName="password"
+                            class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                    </div>
+                    @if (f['password'].touched && f['password'].errors?.['required']) {
+                    <p class="mt-1 text-xs text-red-600">La contraseña es requerida</p>
+                    }
+                    @if (f['password'].touched && f['password'].errors?.['minlength']) {
+                    <p class="mt-1 text-xs text-red-600">La contraseña debe tener al menos 6 caracteres</p>
+                    }
+                </div>
+
+                <div>
+                    <button type="submit" [disabled]="registerForm.invalid || isLoading()"
+                        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors disabled:opacity-70 disabled:cursor-not-allowed">
+                        @if (isLoading()) {
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                            </circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
+                        </svg>
+                        Registrando...
+                        } @else {
+                        Crear cuenta
+                        }
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-6">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500">
+                            ¿Ya tienes una cuenta?
+                        </span>
+                    </div>
+                </div>
+
+                <div class="mt-6 grid grid-cols-1 gap-3">
+                    <a routerLink="/login"
+                        class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        Iniciar Sesión
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -9,8 +9,18 @@
         </a>
         <h1 class="text-2xl font-bold text-gray-800">Detalles</h1>
     </div>
-
     @if (pet(); as p) {
+    <div class="flex justify-end">
+        <a [routerLink]="['/pets', p.id, 'edit']"
+            class="text-primary hover:text-primary-dark font-medium text-sm flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                    d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+            </svg>
+            Editar
+        </a>
+    </div>
+
     <!-- Profile Header -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col items-center text-center">
         <div class="relative w-32 h-32 rounded-full overflow-hidden bg-gray-100 mb-4 border-4 border-white shadow-md">
@@ -29,34 +39,143 @@
         </div>
     </div>
 
-    <!-- Info Grid -->
-    <div class="grid grid-cols-2 gap-4">
-        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-            <span class="text-xs text-gray-400 uppercase tracking-wide">Actividad</span>
-            <p class="text-lg font-semibold text-gray-800 mt-1">Alta</p>
-            <p class="text-xs text-teal-500 font-medium">+12% vs ayer</p>
+    <!-- Activities Section -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="font-bold text-gray-800 text-lg">Actividades Recientes</h3>
+            <button (click)="isAddingActivity.set(!isAddingActivity())"
+                class="text-sm text-primary hover:text-primary-dark font-medium flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Registrar
+            </button>
         </div>
-        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-            <span class="text-xs text-gray-400 uppercase tracking-wide">Salud</span>
-            <p class="text-lg font-semibold text-gray-800 mt-1">98%</p>
-            <p class="text-xs text-gray-500 font-medium">Batería OK</p>
+
+        @if (isAddingActivity()) {
+        <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200 animate-fadeIn">
+            <h4 class="text-sm font-semibold text-gray-700 mb-3">Nueva Actividad</h4>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1">Tipo</label>
+                    <div class="flex gap-2">
+                        <button (click)="newActivityType.set('walk')" [class.bg-blue-100]="newActivityType() === 'walk'"
+                            [class.text-blue-700]="newActivityType() === 'walk'"
+                            [class.border-blue-200]="newActivityType() === 'walk'"
+                            class="flex-1 py-2 rounded-md border border-gray-200 bg-white text-sm font-medium hover:bg-gray-50 transition-colors">
+                            Paseo
+                        </button>
+                        <button (click)="newActivityType.set('play')"
+                            [class.bg-green-100]="newActivityType() === 'play'"
+                            [class.text-green-700]="newActivityType() === 'play'"
+                            [class.border-green-200]="newActivityType() === 'play'"
+                            class="flex-1 py-2 rounded-md border border-gray-200 bg-white text-sm font-medium hover:bg-gray-50 transition-colors">
+                            Juego
+                        </button>
+                        <button (click)="newActivityType.set('rest')"
+                            [class.bg-purple-100]="newActivityType() === 'rest'"
+                            [class.text-purple-700]="newActivityType() === 'rest'"
+                            [class.border-purple-200]="newActivityType() === 'rest'"
+                            class="flex-1 py-2 rounded-md border border-gray-200 bg-white text-sm font-medium hover:bg-gray-50 transition-colors">
+                            Descanso
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1">Duración (minutos)</label>
+                    <input type="number" [(ngModel)]="newActivityDuration" min="1"
+                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 text-sm">
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button (click)="isAddingActivity.set(false)"
+                        class="px-3 py-1.5 text-xs text-gray-600 hover:text-gray-800 font-medium">Cancelar</button>
+                    <button (click)="saveActivity()" [disabled]="isLoadingActivity()"
+                        class="px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-md hover:bg-primary-dark shadow-sm disabled:opacity-50">
+                        {{ isLoadingActivity() ? 'Guardando...' : 'Guardar Actividad' }}
+                    </button>
+                </div>
+            </div>
         </div>
+        }
+
+        @if (activities().length > 0) {
+        <div class="space-y-4">
+            @for (act of activities(); track $index) {
+            <div class="flex items-center gap-4 p-3 rounded-lg bg-gray-50 border border-gray-100">
+                <div class="p-2 rounded-full" [class.bg-blue-100]="act.type === 'walk'"
+                    [class.text-blue-600]="act.type === 'walk'" [class.bg-green-100]="act.type === 'play'"
+                    [class.text-green-600]="act.type === 'play'" [class.bg-purple-100]="act.type === 'rest'"
+                    [class.text-purple-600]="act.type === 'rest'">
+                    <!-- Icons based on type -->
+                    @if (act.type === 'walk') {
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    }
+                    @if (act.type === 'play') {
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    }
+                    @if (act.type === 'rest') {
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                    }
+                </div>
+                <div class="flex-1">
+                    <p class="font-medium text-gray-900 capitalize">{{ act.type === 'walk' ? 'Paseo' : act.type ===
+                        'play' ? 'Juego' : 'Descanso' }}</p>
+                    <p class="text-xs text-gray-500">{{ act.timestamp | date:'short' }}</p>
+                </div>
+                <div class="text-sm font-semibold text-gray-700">
+                    {{ act.duration }} min
+                </div>
+            </div>
+            }
+        </div>
+        } @else {
+        <p class="text-gray-500 text-center py-4">No hay actividades registradas.</p>
+        }
     </div>
 
     <!-- Map Placeholder -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-100">
+        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
             <h3 class="font-bold text-gray-800">Ubicación Actual</h3>
+            @if (currentLocation()) {
+            <span class="text-xs font-mono text-green-600 bg-green-50 px-2 py-1 rounded-full animate-pulse">En
+                vivo</span>
+            }
         </div>
-        <div class="h-48 bg-gray-100 relative items-center justify-center flex">
+        <div class="h-48 bg-gray-100 relative items-center justify-center flex flex-col">
+            @if (currentLocation(); as loc) {
+            <span class="text-primary font-bold text-xl mb-1 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                        clip-rule="evenodd" />
+                </svg>
+                {{ loc.lat | number:'1.4-4' }}, {{ loc.lng | number:'1.4-4' }}
+            </span>
+            <p class="text-xs text-gray-500">Coordenadas en tiempo real</p>
+            } @else {
             <span class="text-gray-400 font-medium flex gap-2 items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd"
                         d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
                         clip-rule="evenodd" />
                 </svg>
-                Mapa Interactivo
+                Esperando ubicación...
             </span>
+            }
         </div>
     </div>
 
